@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCustomerRequest;
+use App\Http\Requests\UpdateCustomerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Customer;
@@ -32,21 +34,14 @@ class CustomerController extends Controller
     /**
      * Store a newly created customer in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCustomerRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:customers',
-            'annualSpend' => 'nullable|numeric',
-            'lastPurchaseDate' => 'nullable|date',
-        ]);
-
         $customer = Customer::create([
             'id' => (string) Str::uuid(),
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'annualSpend' => $validatedData['annualSpend'] ?? null,
-            'lastPurchaseDate' => $validatedData['lastPurchaseDate'] ?? null,
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'annualSpend' => $request->input('annualSpend', null),
+            'lastPurchaseDate' => $request->input('lastPurchaseDate', null),
         ]);
 
         return response()->json($customer, 201);
@@ -69,7 +64,7 @@ class CustomerController extends Controller
     /**
      * Update the specified customer by ID.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCustomerRequest $request, string $id)
     {
         $customer = Customer::find($id);
 
@@ -77,14 +72,7 @@ class CustomerController extends Controller
             return response()->json(['error' => 'Customer not found'], 404);
         }
 
-        $validatedData = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:customers,email,' . $id,
-            'annualSpend' => 'nullable|numeric',
-            'lastPurchaseDate' => 'nullable|date',
-        ]);
-
-        $customer->update($validatedData);
+        $customer->update($request->all());
 
         return response()->json($customer);
     }
