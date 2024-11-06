@@ -28,6 +28,9 @@ class Customer extends Model
         'lastPurchaseDate',
     ];
 
+    /**
+     * @return string
+     */
     public function getTierAttribute(): string
     {
         if (is_null($this->annualSpend) || $this->annualSpend < 1000) {
