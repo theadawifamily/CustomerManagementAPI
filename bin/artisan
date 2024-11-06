@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# This script passes all parameters to the php command inside the php container
+docker-compose exec app php artisan "$@"
