@@ -168,4 +168,297 @@ class CustomerControllerTest extends TestCase
 
         $this->assertDatabaseMissing('customers', ['id' => $customer->id]);
     }
+
+    //Email test section:
+
+    /**
+     * Test that email is required.
+     */
+    public function test_email_is_required()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Missing Email User',
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    /**
+     * Test that email must be a string.
+     */
+    public function test_email_must_be_a_string()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Non-string Email User',
+            'email' => 12345, // Non-string value
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    /**
+     * Test that email must follow valid format.
+     */
+    public function test_email_format_validation()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Invalid Format User',
+            'email' => 'invalid-email-format',
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    /**
+     * Test that email does not exceed maximum length.
+     */
+    public function test_email_max_length_validation()
+    {
+        $longEmail = str_repeat('a', 246) . '@example.com'; // 256 characters
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Long Email User',
+            'email' => $longEmail,
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    /**
+     * Test that email must be unique.
+     */
+    public function test_email_must_be_unique()
+    {
+        Customer::factory()->create(['email' => 'duplicate@example.com']);
+
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Duplicate Email User',
+            'email' => 'duplicate@example.com', // Already exists in database
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    /**
+     * Test that a valid email passes all validation checks.
+     */
+    public function test_valid_email_passes_validation()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Valid Email User',
+            'email' => 'valid.email@example.com',
+            'annualSpend' => 1000.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonFragment([
+                'name' => 'Valid Email User',
+                'email' => 'valid.email@example.com',
+            ]);
+    }
+
+    /**
+     * Test updating a customer with the same email (unique validation should ignore the current record).
+     */
+    public function test_update_customer_with_same_email()
+    {
+        // Create a customer
+        $customer = Customer::factory()->create([
+            'name' => 'Existing Customer',
+            'email' => 'existing.email@example.com',
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        // Attempt to update the customer without changing the email
+        $response = $this->putJson("/api/customers/{$customer->id}", [
+            'name' => 'Updated Customer',
+            'email' => 'existing.email@example.com', // Same email as before
+            'annualSpend' => 1000.00,
+            'lastPurchaseDate' => '2024-06-01T00:00:00Z',
+        ]);
+
+        // Assert that the update is successful
+        $response->assertStatus(200)
+            ->assertJson([
+                'id' => $customer->id,
+                'name' => 'Updated Customer',
+                'email' => 'existing.email@example.com',
+                'annualSpend' => 1000.00,
+                'lastPurchaseDate' => '2024-06-01T00:00:00Z',
+            ]);
+    }
+
+    // Name test section:
+
+    /**
+     * Test that name is required.
+     */
+    public function test_name_is_required()
+    {
+        $response = $this->postJson('/api/customers', [
+            'email' => 'valid.email@example.com',
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
+    }
+
+    /**
+     * Test that name must be a string.
+     */
+    public function test_name_must_be_a_string()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 12345, // Non-string value
+            'email' => 'valid.email@example.com',
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
+    }
+
+    /**
+     * Test that name does not exceed maximum length.
+     */
+    public function test_name_max_length_validation()
+    {
+        $longName = str_repeat('a', 256); // 256 characters
+        $response = $this->postJson('/api/customers', [
+            'name' => $longName,
+            'email' => 'valid.email@example.com',
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
+    }
+
+    /**
+     * Test that a valid name passes all validation checks.
+     */
+    public function test_valid_name_passes_validation()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Valid Name User',
+            'email' => 'valid.email@example.com',
+            'annualSpend' => 1000.00,
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonFragment([
+                'name' => 'Valid Name User',
+                'email' => 'valid.email@example.com',
+            ]);
+    }
+
+    // annualSpend test section:
+
+    /**
+     * Test that annualSpend can be null.
+     */
+    public function test_annualSpend_can_be_null()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Null Annual Spend User',
+            'email' => 'null.annualspend@example.com',
+            'annualSpend' => null, // Null value
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonFragment(['annualSpend' => null]);
+    }
+
+    /**
+     * Test that annualSpend must be numeric.
+     */
+    public function test_annualSpend_must_be_numeric()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Non-numeric Annual Spend User',
+            'email' => 'non.numeric@example.com',
+            'annualSpend' => 'not-a-number', // Invalid non-numeric value
+            'lastPurchaseDate' => '2024-01-01T00:00:00Z',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['annualSpend']);
+    }
+
+    // lastPurchaseDate test section:
+
+    /**
+     * Test that lastPurchaseDate can be null.
+     */
+    public function test_lastPurchaseDate_can_be_null()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Null Last Purchase Date User',
+            'email' => 'null.lastpurchase@example.com',
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => null, // Null value
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonFragment(['lastPurchaseDate' => null]);
+    }
+
+    /**
+     * Test that lastPurchaseDate must be a valid date.
+     */
+    public function test_lastPurchaseDate_must_be_a_valid_date()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Invalid Date User',
+            'email' => 'invalid.date@example.com',
+            'annualSpend' => 500.00,
+            'lastPurchaseDate' => 'invalid-date', // Invalid date format
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['lastPurchaseDate']);
+    }
+
+    /**
+     * Test that valid annualSpend and lastPurchaseDate pass validation.
+     */
+    public function test_valid_annualSpend_and_lastPurchaseDate_pass_validation()
+    {
+        $response = $this->postJson('/api/customers', [
+            'name' => 'Valid Data User',
+            'email' => 'valid.data@example.com',
+            'annualSpend' => 1000.00,
+            'lastPurchaseDate' => '2024-06-01T00:00:00Z', // Valid date
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonFragment([
+                'name' => 'Valid Data User',
+                'email' => 'valid.data@example.com',
+                'annualSpend' => 1000.00,
+                'lastPurchaseDate' => '2024-06-01T00:00:00Z',
+            ]);
+    }
 }
