@@ -6,6 +6,9 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Customer;
 
+/**
+ * @group crud
+ */
 class CustomerControllerTest extends TestCase
 {
     use RefreshDatabase;
@@ -74,6 +77,56 @@ class CustomerControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonFragment([
                 'email' => 'test_customer@yahoo.com',
+            ]);
+    }
+
+    /**
+     * Test retrieving a customer by either email or name.
+     */
+    public function test_retrieve_customer_by_email_or_name()
+    {
+        // Create two customers with different names and emails
+        Customer::factory()->create(['name' => 'Alice Smith', 'email' => 'alice@example.com']);
+        Customer::factory()->create(['name' => 'Bob Johnson', 'email' => 'bob@example.com']);
+
+        // Try retrieving with both name and email (should match one if OR logic is applied)
+        $response = $this->getJson('/api/customers?name=Alice Smith&email=nonexistent@example.com');
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'name' => 'Alice Smith',
+                'email' => 'alice@example.com',
+            ]);
+
+        // If both are incorrect, no match should be found
+        $response = $this->getJson('/api/customers?name=Nonexistent&email=nonexistent@example.com');
+
+        $response->assertStatus(200)
+            ->assertJsonMissing([
+                'name' => 'Alice Smith',
+                'email' => 'alice@example.com',
+            ])
+            ->assertJsonMissing([
+                'name' => 'Bob Johnson',
+                'email' => 'bob@example.com',
+            ]);
+
+        // Scenario: Name exists and email does not exist
+        $response = $this->getJson('/api/customers?name=Alice Smith&email=nonexistent@example.com');
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'name' => 'Alice Smith',
+                'email' => 'alice@example.com',
+            ]);
+
+        // Scenario: Email exists, name does not exist
+        $response = $this->getJson('/api/customers?name=Nonexistent Name&email=bob@example.com');
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'name' => 'Bob Johnson',
+                'email' => 'bob@example.com',
             ]);
     }
 

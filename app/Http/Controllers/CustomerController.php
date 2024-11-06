@@ -15,12 +15,15 @@ class CustomerController extends Controller
     {
         $query = Customer::query();
 
-        if ($request->has('name')) {
-            $query->where('name', $request->input('name'));
-        }
-
-        if ($request->has('email')) {
-            $query->where('email', $request->input('email'));
+        if ($request->has('name') || $request->has('email')) {
+            $query->where(function ($q) use ($request) {
+                if ($request->has('name')) {
+                    $q->where('name', $request->input('name'));
+                }
+                if ($request->has('email')) {
+                    $q->orWhere('email', $request->input('email'));
+                }
+            });
         }
 
         return response()->json($query->get());

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Check if the app container is running
+container_id=$(docker ps -qf "name=app")
+
+if [ -z "$container_id" ]; then
+  echo "App container is not running. Please start the container first."
+  exit 1
+fi
+
+# Access the app container with an interactive bash shell
+docker exec -it "$container_id" bash
