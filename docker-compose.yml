@@ -7,7 +7,8 @@ services:
         volumes:
             - .:/var/www/html
             - ./database/migrations:/var/www/html/database/migrations # Store SQLite data in a persistent volume
-        command: php-fpm  # Run PHP-FPM instead of Laravel's built-in server
+        # Run migrations as part of the startup command, then start PHP-FPM
+        command: sh -c "php artisan migrate --force && php-fpm"
         expose:
             - "9000"  # Expose PHP-FPM on port 9000 for nginx to access
 
