@@ -67,14 +67,67 @@ The current version of this API is v1
 - **Sample Request**:
   ```bash
   curl -X POST http://localhost:8000/api/customers -H "Content-Type: application/json" -d '{"name": "John Doe", "email": "johndoe@example.com", "annualSpend": 1000.50, "lastPurchaseDate": "2024-01-01T00:00:00Z"}'
-
+- **Responses**:
+  - 201: Customer created successfully.
+    ```json
+    {
+      "id": "uuid",
+      "name": "John Doe",
+      "email": "johndoe@example.com",
+      "annualSpend": 1000.50,
+      "lastPurchaseDate": "2024-01-01T00:00:00Z",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  - 400: Invalid request (e.g., email not provided or formatted incorrectly).
+    ```json
+    {
+      "error": "Invalid request",
+      "message": "The email field is required."
+    }
+  - 500: Internal server error due to a database  error.
+    ```json
+    {
+      "error": "Failed to create customer due to a database error."
+    }
+  - 500: Internal server error due to a  general error.
+    ```json
+    {
+      "error": "An unexpected error occurred while creating the customer."
+    }
 #### 2. Retrieve a Customer by ID
 - **Endpoint**: `GET /api/v1/customers/{id}`
 - **Description**: Fetches a customer’s details by their unique ID.
 - **Sample Request**:
   ```bash
   curl -X GET http://localhost:8000/api/v1/customers/{id}
-
+- **Responses**:
+  - 200: Customer details retrieved successfully.
+    ```json
+    {
+      "id": "uuid",
+      "name": "John Doe",
+      "email": "johndoe@example.com",
+      "annualSpend": 1000.50,
+      "lastPurchaseDate": "2024-01-01T00:00:00Z",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  - 404: Customer not found
+    ```json
+    {
+      "error": "Customer not found"
+    }
+  - 500: Internal server error due to a database error.
+    ```json
+    {
+      "error": "Failed to retrieve customer due to a database error."
+    }
+  - 500: Internal server error due to a  general error.
+    ```json
+    {
+      "error": "An unexpected error occurred while retrieving the customer.."
+    }
 #### 3. Retrieve Customers by Name or Email
 - **Endpoint**: `GET /api/v1/customers`
 - **Description**: Fetches customers filtered by name, email, or both. If both are provided, it uses OR logic to match either.
@@ -88,7 +141,49 @@ The current version of this API is v1
   **Filter by Both Name and Email (OR logic)**:
   ```bash
   curl -X GET http://localhost:8000/api/v1/customers?name=Alice Smith&email=nonexistent@example.com
-
+- **Responses**:
+  - **200**: Customers retrieved successfully. Returns an array of customer objects that match the filter criteria.
+    ```json
+    [
+      {
+        "id": "uuid",
+        "name": "Jane Doe",
+        "email": "janedoe@example.com",
+        "annualSpend": 1500.00,
+        "lastPurchaseDate": "2024-02-01T00:00:00Z",
+        "created_at": "2023-05-01T00:00:00Z",
+        "updated_at": "2024-02-01T00:00:00Z"
+      },
+      {
+        "id": "uuid",
+        "name": "John Smith",
+        "email": "johnsmith@example.com",
+        "annualSpend": 2000.75,
+        "lastPurchaseDate": "2024-06-01T00:00:00Z",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-06-01T00:00:00Z"
+      }
+    ]
+    ```
+  - **400**: Invalid request (e.g., if parameters are not provided in the expected format).
+    ```json
+    {
+      "error": "Invalid request",
+      "message": "The name or email parameter is required."
+    }
+    ```
+  - **500**: Internal server error due to a database  error.
+    ```json
+    {
+      "error": "Failed to retrieve customers due to a database error."
+    }
+    ```
+  - **500**: Internal server error due to a  general error.
+    ```json
+    {
+      "error": "Failed to retrieve customers due to a database error."
+    }
+    ```
 #### 4. Upate a Customer
 - **Endpoint**: `PUT /api/v1/customers/{id}`
 - **Description**: Updates an existing customer’s information. Email uniqueness is validated, but the customer’s current email is excluded from this check.
@@ -103,14 +198,60 @@ The current version of this API is v1
 - **Sample Request**:
   ```bash
   curl -X PUT http://localhost:8000/api/v1/customers/{id} -H "Content-Type: application/json" -d '{"name": "John Smith", "email": "johnsmith@example.com", "annualSpend": 2000.75, "lastPurchaseDate": "2024-06-01T00:00:00Z"}'
-
+- **Responses**:
+  - 200: Customer updated successfully.
+    ```json
+     {
+      "id": "uuid",
+      "name": "Jane Doe",
+      "email": "janedoe@example.com",
+      "annualSpend": 2000.75,
+      "lastPurchaseDate": "2024-06-01T00:00:00Z",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-06-01T00:00:00Z"
+     }
+  - 404: Customer not found
+    ```json
+    {
+      "error": "Customer not found"
+    }
+  - 500: Internal server error due to a database  error
+    ```json
+    {
+      "error": "Failed to update customer due to a database error."
+    }
+  - 500: Internal server error due to a  general error
+    ```json
+    {
+      "error": "An unexpected error occurred while updating the customer."
+    }
 #### 5. Delete a Customer
 - **Endpoint**: `DELETE /api/v1/customers/{id}`
 - **Description**: Deletes a customer by their unique ID.
 - **Sample Request**:
   ```bash
   curl -X DELETE http://localhost:8000/api/v1/customers/{id}
-
+- **Responses**:
+  - 200: Customer deleted successfully.
+    ```json
+    {
+      "message": "Customer deleted successfully"
+    }
+  - 404: Customer not found
+    ```json
+    {
+      "message": "Customer not found"
+    }
+  - 500: Internal server error due to a database error
+    ```json
+    {
+      "message": "Failed to delete customer due to a database error."
+    }
+  - 500: Internal server error due to a  general error
+    ```json
+    {
+      "message": "An unexpected error occurred while deleting the customer."
+    }
 ## Validation Rules
 
 #### Create Customer Validation
