@@ -334,10 +334,14 @@ The `tier` value is automatically calculated and included in the customer respon
   - This API does not include authentication, as it was not specified in the project requirements. The current implementation is designed to fulfill the specified functionality without requiring customers to provide credentials.
 
 - **Retrieving customers by name / email**:
-  - The logic written to retrieve customers allow either condition to match (email or name).
+  - The logic pertaining to retrieving customer by id or email was a little confusing to me. I was not sure if we use `where` or `orWhere` statement. 
+  - The logic I wrote to retrieve customers allows either condition to match (email or name).
   - If only name exists, it will match based on name, and if only email exists, it will match based on email.
   - If both are provided, it will return any customer with either the matching name or the matching email.
   - Business logic for calculating tier will default to Silver if all conditions fail.
+
+- **Open API Specification**:
+  - I used the README.md file to document the API
 
 ## Unit testing
   - To test crud functionality, run:
