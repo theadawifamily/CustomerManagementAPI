@@ -349,6 +349,8 @@ The `tier` value is automatically calculated and included in the customer respon
 - **Open API Specification**:
   - I used the README.md file to document the API
 
+- **Base URL**:
+  - This documentation assumes local development testing and uses http://localhost:8000 as a base URL. Make sure to adjust the base URL based on your domain name/host
 ## Unit testing
   - To test crud functionality, run:
     ```bash
