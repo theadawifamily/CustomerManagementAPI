@@ -4,10 +4,12 @@ This is a Laravel-based RESTful API for managing customer data. The application 
 ## Table of Contents
 - [Building and Running the Application](#building-and-running-the-application)
 - [Accessing the SQLite Database Console](#accessing-the-sqlite-database-console)
+- [Accessing app container](#accessing-app-container)
 - [API Endpoints and Sample Requests](#api-endpoints-and-sample-requests)
 - [Validation Rules](#validation-rules)
 - [Business Logic Requirements](#business-logic-requirements)
 - [Assumptions Made](#assumptions-made)
+- [Unit testing](#unit-testing)
 ---
 
 ## Building and Running the Application
@@ -42,6 +44,11 @@ This is a Laravel-based RESTful API for managing customer data. The application 
 2. **Once inside SQLite, you can select a table**:
    ```bash
    select * from table_name
+
+## Accessing app container
+  - To ssh into the app container, run the following from the root directory:
+    ```bash
+    bin/access_app
 
 ## API Endpoints and Sample Requests
 
@@ -156,18 +163,49 @@ The API implements an on-the-fly **tier calculation** based on the `annualSpend`
 
 The `tier` value is automatically calculated and included in the customer response when retrieving customer information.
 
-### Example Response with Tier Calculation
-A sample response might look like this:
+## Example Response with Tier Calculation
+- **A sample response might look like this**:
 
-```json
-{
-  "id": "12345",
-  "name": "John Doe",
-  "email": "johndoe@example.com",
-  "annualSpend": 12000,
-  "lastPurchaseDate": "2024-06-01T00:00:00Z",
-  "created_at": "2023-06-01T00:00:00Z",
-  "updated_at": "2024-01-01T00:00:00Z",
-  "tier": "Platinum"
-}
+  ```json
+  {
+    "id": "12345",
+    "name": "John Doe",
+    "email": "johndoe@example.com",
+    "annualSpend": 12000,
+    "lastPurchaseDate": "2024-06-01T00:00:00Z",
+    "created_at": "2023-06-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "tier": "Platinum"
+  }
 
+## Assumptions Made
+- **.env file**:
+  - Since this code is for demo purposes and not meant to be deployed to production, I included the `.env` file with the repo.
+  - In case of a production deployment, the .env file will be added to `.gitignore` file. 
+  - In a production deployment, sensitive data will be added to AWS secret manager and the `.env` will be build during deployment using AWS secret manager.
+
+- **Payload**:
+  - For simplicity, I am not encoding data in query parameters. 
+  - Encoding query parameters may be helpful if they contain complex or special characters, such as +, =, or &, which can break URLs if not encoded properly.
+
+- **Authentication**:
+  - This API does not include authentication, as it was not specified in the project requirements. The current implementation is designed to fulfill the specified functionality without requiring customers to provide credentials.
+
+- **Retrieving customers by name / email**:
+  - The logic written to retrieve customers allow either condition to match (email or name).
+  - If only name exists, it will match based on name, and if only email exists, it will match based on email.
+  - If both are provided, it will return any customer with either the matching name or the matching email.
+  - Business logic for calculating tier will default to Silver if all conditions fail.
+
+## Unit testing
+  - To test crud functionality, run:
+    ```bash
+    bin/artisan test --group crud
+
+  - To test tier functionality, run:
+    ```bash
+    bin/artisan test --group tier
+
+  - To test all functionality, run:
+    ```bash
+    bin/artisan test
