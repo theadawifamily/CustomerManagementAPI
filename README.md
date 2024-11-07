@@ -1,5 +1,6 @@
 
 This is a Laravel-based RESTful API for managing customer data. The application allows creating, reading, updating, and deleting (CRUD) customer records, along with filtering options by name and email.
+The current version of this API is v1
 
 ## Table of Contents
 - [Building and Running the Application](#building-and-running-the-application)
@@ -53,7 +54,7 @@ This is a Laravel-based RESTful API for managing customer data. The application 
 ## API Endpoints and Sample Requests
 
 #### 1. Create a Customer
-- **Endpoint**: `POST /api/customers`
+- **Endpoint**: `POST /api/v1/customers`
 - **Description**: Creates a new customer with the specified attributes.
 - **Request Body**:
    ```json
@@ -68,28 +69,28 @@ This is a Laravel-based RESTful API for managing customer data. The application 
   curl -X POST http://localhost:8000/api/customers -H "Content-Type: application/json" -d '{"name": "John Doe", "email": "johndoe@example.com", "annualSpend": 1000.50, "lastPurchaseDate": "2024-01-01T00:00:00Z"}'
 
 #### 2. Retrieve a Customer by ID
-- **Endpoint**: `GET /api/customers/{id}`
+- **Endpoint**: `GET /api/v1/customers/{id}`
 - **Description**: Fetches a customer’s details by their unique ID.
 - **Sample Request**:
   ```bash
-  curl -X GET http://localhost:8000/api/customers/{id}
+  curl -X GET http://localhost:8000/api/v1/customers/{id}
 
 #### 3. Retrieve Customers by Name or Email
-- **Endpoint**: `GET /api/customers`
+- **Endpoint**: `GET /api/v1/customers`
 - **Description**: Fetches customers filtered by name, email, or both. If both are provided, it uses OR logic to match either.
 - **Sample Request**:
   **Filter by Name**:
   ```bash
-  curl -X GET http://localhost:8000/api/customers?name=Jane Doe
+  curl -X GET http://localhost:8000/api/v1/customers?name=Jane Doe
   **Filter by Email**:
   ```bash
-  curl -X GET http://localhost:8000/api/customers?email=test_customer@yahoo.com
+  curl -X GET http://localhost:8000/api/v1/customers?email=test_customer@yahoo.com
   **Filter by Both Name and Email (OR logic)**:
   ```bash
-  curl -X GET http://localhost:8000/api/customers?name=Alice Smith&email=nonexistent@example.com
+  curl -X GET http://localhost:8000/api/v1/customers?name=Alice Smith&email=nonexistent@example.com
 
 #### 4. Upate a Customer
-- **Endpoint**: `PUT /api/customers/{id}`
+- **Endpoint**: `PUT /api/v1/customers/{id}`
 - **Description**: Updates an existing customer’s information. Email uniqueness is validated, but the customer’s current email is excluded from this check.
 - **Request Body**:
    ```json
@@ -101,14 +102,14 @@ This is a Laravel-based RESTful API for managing customer data. The application 
    }
 - **Sample Request**:
   ```bash
-  curl -X PUT http://localhost:8000/api/customers/{id} -H "Content-Type: application/json" -d '{"name": "John Smith", "email": "johnsmith@example.com", "annualSpend": 2000.75, "lastPurchaseDate": "2024-06-01T00:00:00Z"}'
+  curl -X PUT http://localhost:8000/api/v1/customers/{id} -H "Content-Type: application/json" -d '{"name": "John Smith", "email": "johnsmith@example.com", "annualSpend": 2000.75, "lastPurchaseDate": "2024-06-01T00:00:00Z"}'
 
 #### 5. Delete a Customer
-- **Endpoint**: `DELETE /api/customers/{id}`
+- **Endpoint**: `DELETE /api/v1/customers/{id}`
 - **Description**: Deletes a customer by their unique ID.
 - **Sample Request**:
   ```bash
-  curl -X DELETE http://localhost:8000/api/customers/{id}
+  curl -X DELETE http://localhost:8000/api/v1/customers/{id}
 
 ## Validation Rules
 

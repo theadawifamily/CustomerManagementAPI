@@ -18,7 +18,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_create_customer()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'John Doe',
             'email' => 'johndoe@example.com',
             'annualSpend' => 1000.50,
@@ -38,7 +38,7 @@ class CustomerControllerTest extends TestCase
     {
         $customer = Customer::factory()->create();
 
-        $response = $this->getJson("/api/customers/{$customer->id}");
+        $response = $this->getJson("/api/v1/customers/{$customer->id}");
 
         $response->assertStatus(200)
             ->assertJson([
@@ -57,7 +57,7 @@ class CustomerControllerTest extends TestCase
     {
         Customer::factory()->create(['name' => 'Jane Doe']);
 
-        $response = $this->getJson('/api/customers?name=Jane Doe');
+        $response = $this->getJson('/api/v1/customers?name=Jane Doe');
 
         $response->assertStatus(200)
             ->assertJsonFragment([
@@ -72,7 +72,7 @@ class CustomerControllerTest extends TestCase
     {
         Customer::factory()->create(['email' => 'test_customer@yahoo.com']);
 
-        $response = $this->getJson('/api/customers?email=test_customer@yahoo.com');
+        $response = $this->getJson('/api/v1/customers?email=test_customer@yahoo.com');
 
         $response->assertStatus(200)
             ->assertJsonFragment([
@@ -90,7 +90,7 @@ class CustomerControllerTest extends TestCase
         Customer::factory()->create(['name' => 'Bob Johnson', 'email' => 'bob@example.com']);
 
         // Try retrieving with both name and email (should match one if OR logic is applied)
-        $response = $this->getJson('/api/customers?name=Alice Smith&email=nonexistent@example.com');
+        $response = $this->getJson('/api/v1/customers?name=Alice Smith&email=nonexistent@example.com');
 
         $response->assertStatus(200)
             ->assertJsonFragment([
@@ -99,7 +99,7 @@ class CustomerControllerTest extends TestCase
             ]);
 
         // If both are incorrect, no match should be found
-        $response = $this->getJson('/api/customers?name=Nonexistent&email=nonexistent@example.com');
+        $response = $this->getJson('/api/v1/customers?name=Nonexistent&email=nonexistent@example.com');
 
         $response->assertStatus(200)
             ->assertJsonMissing([
@@ -112,7 +112,7 @@ class CustomerControllerTest extends TestCase
             ]);
 
         // Scenario: Name exists and email does not exist
-        $response = $this->getJson('/api/customers?name=Alice Smith&email=nonexistent@example.com');
+        $response = $this->getJson('/api/v1/customers?name=Alice Smith&email=nonexistent@example.com');
 
         $response->assertStatus(200)
             ->assertJsonFragment([
@@ -121,7 +121,7 @@ class CustomerControllerTest extends TestCase
             ]);
 
         // Scenario: Email exists, name does not exist
-        $response = $this->getJson('/api/customers?name=Nonexistent Name&email=bob@example.com');
+        $response = $this->getJson('/api/v1/customers?name=Nonexistent Name&email=bob@example.com');
 
         $response->assertStatus(200)
             ->assertJsonFragment([
@@ -137,7 +137,7 @@ class CustomerControllerTest extends TestCase
     {
         $customer = Customer::factory()->create();
 
-        $response = $this->putJson("/api/customers/{$customer->id}", [
+        $response = $this->putJson("/api/v1/customers/{$customer->id}", [
             'name' => 'John Smith',
             'email' => 'johnsmith@example.com',
             'annualSpend' => 2000.75,
@@ -161,7 +161,7 @@ class CustomerControllerTest extends TestCase
     {
         $customer = Customer::factory()->create();
 
-        $response = $this->deleteJson("/api/customers/{$customer->id}");
+        $response = $this->deleteJson("/api/v1/customers/{$customer->id}");
 
         $response->assertStatus(200)
             ->assertJson(['message' => 'Customer deleted successfully']);
@@ -176,7 +176,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_email_is_required()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Missing Email User',
             'annualSpend' => 500.00,
             'lastPurchaseDate' => '2024-01-01T00:00:00Z',
@@ -191,7 +191,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_email_must_be_a_string()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Non-string Email User',
             'email' => 12345, // Non-string value
             'annualSpend' => 500.00,
@@ -207,7 +207,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_email_format_validation()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Invalid Format User',
             'email' => 'invalid-email-format',
             'annualSpend' => 500.00,
@@ -224,7 +224,7 @@ class CustomerControllerTest extends TestCase
     public function test_email_max_length_validation()
     {
         $longEmail = str_repeat('a', 246) . '@example.com'; // 256 characters
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Long Email User',
             'email' => $longEmail,
             'annualSpend' => 500.00,
@@ -242,7 +242,7 @@ class CustomerControllerTest extends TestCase
     {
         Customer::factory()->create(['email' => 'duplicate@example.com']);
 
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Duplicate Email User',
             'email' => 'duplicate@example.com', // Already exists in database
             'annualSpend' => 500.00,
@@ -258,7 +258,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_valid_email_passes_validation()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Valid Email User',
             'email' => 'valid.email@example.com',
             'annualSpend' => 1000.00,
@@ -286,7 +286,7 @@ class CustomerControllerTest extends TestCase
         ]);
 
         // Attempt to update the customer without changing the email
-        $response = $this->putJson("/api/customers/{$customer->id}", [
+        $response = $this->putJson("/api/v1/customers/{$customer->id}", [
             'name' => 'Updated Customer',
             'email' => 'existing.email@example.com', // Same email as before
             'annualSpend' => 1000.00,
@@ -311,7 +311,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_name_is_required()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'email' => 'valid.email@example.com',
             'annualSpend' => 500.00,
             'lastPurchaseDate' => '2024-01-01T00:00:00Z',
@@ -326,7 +326,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_name_must_be_a_string()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 12345, // Non-string value
             'email' => 'valid.email@example.com',
             'annualSpend' => 500.00,
@@ -343,7 +343,7 @@ class CustomerControllerTest extends TestCase
     public function test_name_max_length_validation()
     {
         $longName = str_repeat('a', 256); // 256 characters
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => $longName,
             'email' => 'valid.email@example.com',
             'annualSpend' => 500.00,
@@ -359,7 +359,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_valid_name_passes_validation()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Valid Name User',
             'email' => 'valid.email@example.com',
             'annualSpend' => 1000.00,
@@ -380,7 +380,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_annualSpend_can_be_null()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Null Annual Spend User',
             'email' => 'null.annualspend@example.com',
             'annualSpend' => null, // Null value
@@ -396,7 +396,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_annualSpend_must_be_numeric()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Non-numeric Annual Spend User',
             'email' => 'non.numeric@example.com',
             'annualSpend' => 'not-a-number', // Invalid non-numeric value
@@ -414,7 +414,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_lastPurchaseDate_can_be_null()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Null Last Purchase Date User',
             'email' => 'null.lastpurchase@example.com',
             'annualSpend' => 500.00,
@@ -430,7 +430,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_lastPurchaseDate_must_be_a_valid_date()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Invalid Date User',
             'email' => 'invalid.date@example.com',
             'annualSpend' => 500.00,
@@ -446,7 +446,7 @@ class CustomerControllerTest extends TestCase
      */
     public function test_valid_annualSpend_and_lastPurchaseDate_pass_validation()
     {
-        $response = $this->postJson('/api/customers', [
+        $response = $this->postJson('/api/v1/customers', [
             'name' => 'Valid Data User',
             'email' => 'valid.data@example.com',
             'annualSpend' => 1000.00,
