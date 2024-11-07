@@ -343,6 +343,7 @@ The `tier` value is automatically calculated and included in the customer respon
   - The logic I wrote to retrieve customers allows either condition to match (email or name).
   - If only name exists, it will match based on name, and if only email exists, it will match based on email.
   - If both are provided, it will return any customer with either the matching name or the matching email.
+  - The search logic I am using relies on exact matches (using `=` instead of `like` in my query) and therefor, users  must provide exact name and / or email.
   - Business logic for calculating tier will default to Silver if all conditions fail.
 
 - **Open API Specification**:
