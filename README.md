@@ -337,6 +337,8 @@ The `tier` value is automatically calculated and included in the customer respon
   - In case of a production deployment, the .env file will be added to `.gitignore` file. 
   - In a production deployment, sensitive data will be added to AWS secret manager and the `.env` will be built during deployment by retrieving data stored in AWS secret manager.
 
+- **customers table**:
+  - I did not provide any optimizations to the table as I was more focused on delivering the requirements. In a real life scenario, indexing can be applied to the name and email columns.
 - **Payload**:
   - For simplicity, I am not encoding data in query parameters. 
   - Encoding query parameters may be helpful if they contain complex or special characters, such as +, =, or &, which can break URLs if not encoded properly.
