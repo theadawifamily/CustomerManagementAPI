@@ -329,7 +329,7 @@ The `tier` value is automatically calculated and included in the customer respon
 - **.env file**:
   - Since this code is for demo purposes and not meant to be deployed to production, I included the `.env` file with the repo.
   - In case of a production deployment, the .env file will be added to `.gitignore` file. 
-  - In a production deployment, sensitive data will be added to AWS secret manager and the `.env` will be build during deployment using AWS secret manager.
+  - In a production deployment, sensitive data will be added to AWS secret manager and the `.env` will be built during deployment by retrieving data stored in AWS secret manager.
 
 - **Payload**:
   - For simplicity, I am not encoding data in query parameters. 
@@ -339,7 +339,7 @@ The `tier` value is automatically calculated and included in the customer respon
   - This API does not include authentication, as it was not specified in the project requirements. The current implementation is designed to fulfill the specified functionality without requiring customers to provide credentials.
 
 - **Retrieving customers by name / email**:
-  - The logic pertaining to retrieving customer by id or email was a little confusing to me. I was not sure if we use `where` or `orWhere` statement. 
+  - The logic pertaining to retrieving customers by id or email was a little confusing to me. I was not sure if we use `where` or `orWhere` statement. 
   - The logic I wrote to retrieve customers allows either condition to match (email or name).
   - If only name exists, it will match based on name, and if only email exists, it will match based on email.
   - If both are provided, it will return any customer with either the matching name or the matching email.
