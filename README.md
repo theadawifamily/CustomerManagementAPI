@@ -66,7 +66,7 @@ The current version of this API is v1
    }
 - **Sample Request**:
   ```bash
-  curl -X POST http://localhost:8000/api/customers -H "Content-Type: application/json" -d '{"name": "John Doe", "email": "johndoe@example.com", "annualSpend": 1000.50, "lastPurchaseDate": "2024-01-01T00:00:00Z"}'
+  curl -X POST http://localhost:8000/api/v1/customers -H "Content-Type: application/json" -d '{"name": "John Doe", "email": "johndoe@example.com", "annualSpend": 1000.50, "lastPurchaseDate": "2024-01-01T00:00:00Z"}'
 - **Responses**:
   - 201: Customer created successfully.
     ```json
@@ -132,13 +132,13 @@ The current version of this API is v1
 - **Endpoint**: `GET /api/v1/customers`
 - **Description**: Fetches customers filtered by name, email, or both. If both are provided, it uses OR logic to match either.
 - **Sample Request**:
-  **Filter by Name**:
+  - **Filter by Name**:
   ```bash
   curl -X GET http://localhost:8000/api/v1/customers?name=Jane Doe
-  **Filter by Email**:
+  - **Filter by Email**:
   ```bash
   curl -X GET http://localhost:8000/api/v1/customers?email=test_customer@yahoo.com
-  **Filter by Both Name and Email (OR logic)**:
+  - **Filter by Both Name and Email (OR logic)**:
   ```bash
   curl -X GET http://localhost:8000/api/v1/customers?name=Alice Smith&email=nonexistent@example.com
 - **Responses**:
