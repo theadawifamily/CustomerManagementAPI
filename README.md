@@ -31,6 +31,12 @@ The current version of this API is v1
    Run the following command to build and start the application with Docker Compose:
    ```bash
    docker-compose up -d --build
+   ```
+   Migration will automatically run via the docker-compose.yml file.
+   You can aslo run migrations manually by executing the following script from the root directory:
+   ```bash
+   bin/run_migrations
+   ```
 
 ## Accessing the SQLite Database Console
 
