@@ -1,5 +1,5 @@
 
-This is a Laravel-based RESTful API for managing customer data. The application allows creating, reading, updating, and deleting (CRUD) customer records, along with filtering options by name and email. It also contains logic that calculates customer tear based on annualSpend and lastPurchaseDate
+This is a Laravel-based RESTful API for managing customer data. The application allows creating, reading, updating, and deleting (CRUD) customer records, along with filtering options by name and email. It also contains logic that calculates customer tier based on annualSpend and lastPurchaseDate
 The current version of this API is v1
 
 ## Table of Contents
